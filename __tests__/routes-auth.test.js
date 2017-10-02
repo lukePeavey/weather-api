@@ -29,7 +29,9 @@ describe('Test authentication routes', () => {
       password: 'password'
     }
     const response = await request(app).post(`/auth/login`).send(user)
-    expect.assertions(1)
+    const data = JSON.parse(response.text)
+    expect.assertions(2)
     expect(response.statusCode).toEqual(200)
+    expect(data).toHaveProperty('token')
   })
 })

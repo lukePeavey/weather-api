@@ -51,3 +51,7 @@ const jwtStrategy = new passportJWT.Strategy(
 
 passport.use(localStrategy)
 passport.use(jwtStrategy)
+
+module.exports = {
+  tokenExpiration: 604800
+}

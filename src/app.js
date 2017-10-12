@@ -24,6 +24,4 @@ app.use(routes.places)
 mongoose.Promise = global.Promise
 mongoose.connect(DATABASE_URL, { useMongoClient: true })
 
-console.log(process.env.NODE_ENV)
-
 module.exports = app

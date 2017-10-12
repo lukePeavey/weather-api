@@ -3,15 +3,19 @@ const bcrypt = require('bcrypt')
 
 const UserSchema = mongoose.Schema(
   {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-    name: {
-      first: { type: String, required: true },
-      last: { type: String, required: true }
-    },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
-    deactivated: { type: Boolean, default: false }
+    deactivated: { type: Boolean, default: false },
+    savedLocations: { type: [String] },
+    defaultLocation: { type: String, default: null },
+    settings: {
+      unit: { type: String, enum: ['fahrenheit', 'celsius'], default: 'fahrenheit' }
+    },
   },
   {
     timestamps: true,
@@ -20,8 +24,11 @@ const UserSchema = mongoose.Schema(
   }
 )
 
+/**
+ * Virtual field: Full name
+ */
 UserSchema.virtual('fullName').get(function() {
-  return `${this.name.first} ${this.name.last}`
+  return `${this.firstName} ${this.lastName}`
 })
 
 /**

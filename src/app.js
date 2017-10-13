@@ -5,12 +5,15 @@ const passport = require('passport')
 const mongoose = require('mongoose')
 const routes = require('./routes')
 const authentication = require('./config/authentication')
+const cookieParser = require('cookie-parser')
 
-const DATABASE_URL = process.env.DATABASE_URL
+// Environment variables
+const { SECRET_KEY, DATABASE_URL } = process.env
 
 // Initialize the app
 const app = express()
 app.use(bodyParser.json())
+app.use(cookieParser(SECRET_KEY))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(passport.initialize())
 

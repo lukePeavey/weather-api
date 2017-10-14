@@ -3,6 +3,17 @@ const passportJWT = require('passport-jwt')
 const passportLocal = require('passport-local')
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+const { fromAuthHeaderAsBearerToken, fromExtractors } = passportJWT.ExtractJwt
+
+/** Custom extractor functions for JWT strategy */
+const extractors = [
+  // Extract auth token from signed cookie
+  req =>  {
+    if (!req || !req.signedCookies) return null
+    return req.signedCookies['jwt'] || null
+  },
+  // Could add additional extractors here...
+]
 
 /**
  * Local Authentication Strategy
@@ -35,7 +46,7 @@ const localStrategy = new passportLocal.Strategy(
  */
 const jwtStrategy = new passportJWT.Strategy(
   {
-    jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: fromExtractors(extractors),
     secretOrKey: process.env.SECRET_KEY,
     session: false
   },
@@ -51,3 +62,7 @@ const jwtStrategy = new passportJWT.Strategy(
 
 passport.use(localStrategy)
 passport.use(jwtStrategy)
+
+module.exports = {
+  tokenExpiration: 604800
+}

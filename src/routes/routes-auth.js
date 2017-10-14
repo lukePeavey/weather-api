@@ -11,8 +11,10 @@ const authenticate = passport.authenticate('local', { session: false })
 /**
  * Login Route
  * Uses the local authentication strategy. If a user successfully logs in with
- * username and password, a json web token (JWT) is sent to the client which
- * can be used to authenticate subsequent requests to the API.
+ * username and password, a json web token (JWT) is created which will be used
+ * to authenticate subsequent API requests from the user. The token is stored
+ * on the client as a cookie.
+ * @todo further research: cookies vs local storage (for jwt)
  */
 router.post('/auth/login', authenticate, async (req, res, next) => {
   const user = req.user
@@ -20,6 +22,15 @@ router.post('/auth/login', authenticate, async (req, res, next) => {
   const token = jwt.sign(payload, process.env.SECRET_KEY, {
     expiresIn: tokenExpiration
   })
+  // Send token to the client as cookie
+  res.cookie('jwt', token, {
+    signed: true,
+    httpOnly: true,
+    maxAge: tokenExpiration,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production',
+  })
+
   res.json({ status: 'OK', token, tokenExpiration })
 })
 

@@ -8,15 +8,17 @@ const KEY = process.env.WEATHER_UNDERGROUND_KEY
  *   This can be a US zip code or longitude,latitude
  */
 router.get('/weather/', async (req, res, next) => {
-  const {query, params} = req
-  let features = String(query.features).split(',').join('/')
+  const { query, params } = req
+  let features = String(query.features)
+    .split(',')
+    .join('/')
   let place = query.place || 'autoip'
   try {
     const apiResponse = await fetch(`${API_BASE}/${KEY}/${features}/q/${place}.json`)
     const data = await apiResponse.json()
     res.json(data)
-  } catch(err) {
-    res.status
+  } catch (err) {
+    return next(err)
   }
 })
 

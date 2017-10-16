@@ -14,9 +14,8 @@ router.get('/places/autocomplete/', async (req, res, next) => {
   try {
     const apiResponse = await GoogleMaps.placesAutoComplete(req.query).asPromise()
     res.status(200).json(apiResponse)
-  } catch(err) {
-    console.error(err)
-    res.status(500)
+  } catch (err) {
+    return next(err)
   }
 })
 
@@ -29,9 +28,8 @@ router.get(`/places/details`, async (req, res, next) => {
   try {
     const apiResponse = await GoogleMaps.place(req.query).asPromise()
     res.status(200).json(apiResponse)
-  } catch(err) {
-    console.error(err)
-    res.status(500)
+  } catch (err) {
+    return next(err)
   }
 })
 

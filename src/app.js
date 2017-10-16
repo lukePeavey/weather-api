@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const routes = require('./routes')
 const authentication = require('./config/authentication')
 const cookieParser = require('cookie-parser')
+const handleErrors = require('./utils/handleErrors')
 
 // Environment variables
 const { SECRET_KEY, DATABASE_URL, DOMAIN } = process.env
@@ -17,7 +18,7 @@ app.use(cookieParser(SECRET_KEY))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(passport.initialize())
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', DOMAIN )
+  res.header('Access-Control-Allow-Origin', DOMAIN)
   res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept, Cache'
@@ -31,6 +32,7 @@ app.use(routes.users)
 app.use(routes.auth)
 app.use(routes.weather)
 app.use(routes.places)
+app.use(handleErrors)
 
 // Initialize database connection
 mongoose.Promise = global.Promise

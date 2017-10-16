@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 const { tokenExpiration } = require('../config/authentication')
 const { pick } = require('lodash')
+const createError = require('http-errors')
 
 /** Authenticates request using local authentication strategy */
 const authenticate = passport.authenticate('local', { session: false })
@@ -28,10 +29,10 @@ router.post('/auth/login', authenticate, async (req, res, next) => {
     httpOnly: true,
     maxAge: tokenExpiration,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production'
   })
 
-  res.json({ status: 'OK', token, tokenExpiration })
+  res.json({ token, user })
 })
 
 /**
@@ -43,25 +44,23 @@ router.post('/auth/login', authenticate, async (req, res, next) => {
 router.post('/auth/register', async (req, res, next) => {
   // Extract form data
   const { firstName, lastName, email, password } = req.body
-
   // Make sure all of the required fields are present
   if (!firstName || !lastName || !email || !password) {
-    return res.status(401).json({ status: 'MISSING REQUIRED FIELDS' })
+    return next(createError(400, 'Missing required fields'))
   }
 
   try {
-    // Check if the username exists already
+    // Check if the username (email address) is already registered
     let user = await User.findOne({ email })
     if (user !== null) {
-      res.status(422).json({ status: 'EMAIL ADDRESS ALREADY REGISTERED' })
+      return next(createError(422, 'A user with that email address has already registered'))
     } else {
       // Create a new user and save it to the database
       user = await new User({ email, password, firstName, lastName }).save()
-      res.status(200).json({ status: 'OK', user })
+      res.status(200).json({ user })
     }
   } catch (err) {
-    console.error(err)
-    response.status(500)
+    return next(err)
   }
 })
 

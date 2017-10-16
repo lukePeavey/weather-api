@@ -15,8 +15,7 @@ router.get(`/users`, async (req, res, next) => {
     let users = await User.find({})
     res.status(200).json(users)
   } catch (err) {
-    console.error(err)
-    res.sendStatus(500)
+    return next(err)
   }
 })
 
@@ -37,8 +36,7 @@ router.put(`/user`, authenticate, async (req, res, next) => {
     await User.update({ _id: req.user._id }, updateFields)
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    console.error(err)
-    res.sendStatus(500)
+    return next(err)
   }
 })
 
@@ -51,8 +49,7 @@ router.delete(`/user`, authenticate, async (req, res, next) => {
     await User.remove({ _id: req.user._id })
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    console.error(err)
-    res.sendStatus(200)
+    return next(err)
   }
 })
 
@@ -65,14 +62,10 @@ router.delete(`/user`, authenticate, async (req, res, next) => {
 router.put(`/user/locations/`, authenticate, async (req, res, next) => {
   const locationID = String(req.query.id)
   try {
-    await User.update(
-      { _id: req.user._id },
-      { $addToSet: { savedLocations: locationID } }
-    )
+    await User.update({ _id: req.user._id }, { $addToSet: { savedLocations: locationID } })
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    console.log(err)
-    res.sendStatus(500)
+    return next(err)
   }
 })
 
@@ -84,14 +77,10 @@ router.put(`/user/locations/`, authenticate, async (req, res, next) => {
 router.delete(`/user/locations/:id`, authenticate, async (req, res, next) => {
   const locationID = String(req.params.id)
   try {
-    await User.update(
-      { _id: req.user._id },
-      { $pullAll: { savedLocations: [locationID] } }
-    )
+    await User.update({ _id: req.user._id }, { $pullAll: { savedLocations: [locationID] } })
     res.status(200).json({ status: 'OK' })
   } catch (err) {
-    console.log(err)
-    res.sendStatus(500)
+    return next(err)
   }
 })
 

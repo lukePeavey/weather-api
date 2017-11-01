@@ -59,10 +59,10 @@ router.delete(`/user`, authenticate, async (req, res, next) => {
  * are stored directly in the user document, as an array of ids. The ids
  * correspond to locations from the Google Places API.
  */
-router.put(`/user/locations/`, authenticate, async (req, res, next) => {
-  const locationID = String(req.query.id)
+router.post(`/user/places/`, authenticate, async (req, res, next) => {
+  const placeID = String(req.body.place_id)
   try {
-    await User.update({ _id: req.user._id }, { $addToSet: { savedLocations: locationID } })
+    await User.update({ _id: req.user._id }, { $addToSet: { places: placeID } })
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     return next(err)
@@ -71,13 +71,30 @@ router.put(`/user/locations/`, authenticate, async (req, res, next) => {
 
 /**
  * Removed a saved location from the authenticated user.
- * The provided locationID is removed from the array of stored locations
+ * The provided placeID is removed from the array of stored locations
  * for the authenticated user.
  */
-router.delete(`/user/locations/:id`, authenticate, async (req, res, next) => {
-  const locationID = String(req.params.id)
+router.delete(`/user/places/:id`, authenticate, async (req, res, next) => {
+  const placeID = String(req.params.id)
   try {
-    await User.update({ _id: req.user._id }, { $pullAll: { savedLocations: [locationID] } })
+    await User.update({ _id: req.user._id }, { $pullAll: { places: [placeID] } })
+    res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    return next(err)
+  }
+})
+
+/**
+ * Updates the saved settings for the authenticated user.
+ * The provided settings object will overwrite the existing settings,
+ * not merge with it.
+ *
+ * @param {Object} req.query.settings
+ */
+router.post(`/user/settings/`, authenticate, async (req, res, next) => {
+  const { settings } = req.body
+  try {
+    await User.update({ _id: req.user._id }, { settings })
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     return next(err)

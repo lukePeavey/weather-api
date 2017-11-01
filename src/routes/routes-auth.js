@@ -64,4 +64,21 @@ router.post('/auth/register', async (req, res, next) => {
   }
 })
 
+/**
+ * Logout route
+ * This logs the user out by removing the jwt cookie from the
+ * client. IF the client is not authenticated this has no effect.
+ */
+router.post('/auth/logout', async (req, res, next) => {
+  console.log('logout')
+  // Set the jwt cookie to an empty object. This removes the auth
+  // token from the client, ending the login session.
+  res.cookie('jwt', {}, {
+    signed: true,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  })
+  res.status(200).json({ status: 'OK', message: 'Logged Out' })
+})
+
 module.exports = router

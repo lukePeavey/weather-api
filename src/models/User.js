@@ -11,11 +11,12 @@ const UserSchema = mongoose.Schema(
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     deactivated: { type: Boolean, default: false },
-    savedLocations: { type: [String] },
-    defaultLocation: { type: String, default: null },
+    places: { type: [String], default: [] },
+    defaultPlace: { type: String, default: null },
     settings: {
-      unit: { type: String, enum: ['fahrenheit', 'celsius'], default: 'fahrenheit' }
-    },
+      unit: { type: String, enum: ['fahrenheit', 'celsius'], default: 'fahrenheit' },
+      enableAlerts: { type: Boolean, default: false },
+    }
   },
   {
     timestamps: true,

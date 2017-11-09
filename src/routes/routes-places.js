@@ -21,6 +21,9 @@ router.get('/places/autocomplete/', async (req, res, next) => {
     }
     res.status(200).json(predictions)
   } catch (err) {
+    if (err.status === 200 && err.json) {
+      return next(createError(422, err.json.status))
+    }
     return next(err)
   }
 })
@@ -34,13 +37,13 @@ router.get('/places/autocomplete/', async (req, res, next) => {
  */
 router.get(`/places/details`, async (req, res, next) => {
   try {
-    const { status, json: { result } } = await GoogleMaps.place(req.query).asPromise()
-    if (status !== 'OK') {
-      throw createError(422, status)
-    }
+    const { json: { result, status } } = await GoogleMaps.place(req.query).asPromise()
     const { geometry: { location }, photos, ...rest } = result
     res.status(200).json({ location, ...rest })
   } catch (err) {
+    if (err.status === 200 && err.json) {
+      return next(createError(422, err.json.status))
+    }
     return next(err)
   }
 })

@@ -11,7 +11,7 @@ function normalizeUnit(value, key) {
  * cleaner and easier to read.
  *
  * @todo - This should be handled on the client using library like normalizr.
- * @todo - Add documention on the returned data structure and how it differs
+ * @todo - Add documentation on the returned data structure and how it differs
  * from the data returned directly from WU API.
  */
 module.exports = function normalizeWeather(data) {

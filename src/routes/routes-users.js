@@ -53,6 +53,19 @@ router.delete(`/user`, authenticate, async (req, res, next) => {
   }
 })
 
+
+/**
+ * Get array of saved places for the authenticated user
+ */
+router.get('/user/places', authenticate, async (req, res, next) => {
+  try {
+    const savedPlaces = req.user.places
+    res.status(200).json(savedPlaces)
+  } catch (err) {
+    return next(err)
+  }
+})
+
 /**
  * Adds a new saved location to the authenticated user.
  * The app allows users to save locations (for weather forecast). The locations
@@ -60,9 +73,12 @@ router.delete(`/user`, authenticate, async (req, res, next) => {
  * correspond to locations from the Google Places API.
  */
 router.post(`/user/places/`, authenticate, async (req, res, next) => {
-  const placeID = String(req.body.place_id)
   try {
-    await User.update({ _id: req.user._id }, { $addToSet: { places: placeID } })
+    const { place_id, location } = req.body
+    // Add the place to user's saved place if it doesn't exist
+    if (!req.user.places.find(({place_id}) => place_id === place_id)) {
+      await User.update({ _id: req.user._id }, { $addToSet: { places: { place_id, location } } })
+    }
     res.status(200).json({ status: 'OK' })
   } catch (err) {
     return next(err)
@@ -77,8 +93,21 @@ router.post(`/user/places/`, authenticate, async (req, res, next) => {
 router.delete(`/user/places/:id`, authenticate, async (req, res, next) => {
   const placeID = String(req.params.id)
   try {
-    await User.update({ _id: req.user._id }, { $pullAll: { places: [placeID] } })
+    await User.update({ _id: req.user._id }, { $pull: { places: { place_id: placeID } } })
     res.status(200).json({ status: 'OK' })
+  } catch (err) {
+    return next(err)
+  }
+})
+
+
+/**
+ * Get the settings for the authenticated user
+ */
+router.get('/user/settings', authenticate, async (req, res, next) => {
+  try {
+    const settings = req.user.settings
+    res.status(200).json(settings)
   } catch (err) {
     return next(err)
   }

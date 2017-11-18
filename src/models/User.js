@@ -11,11 +11,18 @@ const UserSchema = mongoose.Schema(
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     deactivated: { type: Boolean, default: false },
-    places: { type: [String], default: [] },
     defaultPlace: { type: String, default: null },
+    places: {
+      type: [
+        {
+          place_id: { type: String, required: true },
+          location: { type: Object, required: true }
+        }
+      ]
+    },
     settings: {
       unit: { type: String, enum: ['fahrenheit', 'celsius'], default: 'fahrenheit' },
-      enableAlerts: { type: Boolean, default: false },
+      enableAlerts: { type: Boolean, default: false }
     }
   },
   {
